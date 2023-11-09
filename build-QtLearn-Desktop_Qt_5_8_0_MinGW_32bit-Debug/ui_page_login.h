@@ -33,9 +33,9 @@ public:
     QWidget *widget_2;
     QGridLayout *gridLayout_2;
     QLabel *label;
-    QLineEdit *lineEdit;
+    QLineEdit *usr;
     QLabel *label_2;
-    QLineEdit *lineEdit_2;
+    QLineEdit *pwd_2;
 
     void setupUi(QWidget *Page_Login)
     {
@@ -76,20 +76,20 @@ public:
 
         gridLayout_2->addWidget(label, 0, 0, 1, 1);
 
-        lineEdit = new QLineEdit(widget_2);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        usr = new QLineEdit(widget_2);
+        usr->setObjectName(QStringLiteral("usr"));
 
-        gridLayout_2->addWidget(lineEdit, 0, 1, 1, 1);
+        gridLayout_2->addWidget(usr, 0, 1, 1, 1);
 
         label_2 = new QLabel(widget_2);
         label_2->setObjectName(QStringLiteral("label_2"));
 
         gridLayout_2->addWidget(label_2, 1, 0, 1, 1);
 
-        lineEdit_2 = new QLineEdit(widget_2);
-        lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
+        pwd_2 = new QLineEdit(widget_2);
+        pwd_2->setObjectName(QStringLiteral("pwd_2"));
 
-        gridLayout_2->addWidget(lineEdit_2, 1, 1, 1, 1);
+        gridLayout_2->addWidget(pwd_2, 1, 1, 1, 1);
 
 
         retranslateUi(Page_Login);

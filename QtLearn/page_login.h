@@ -2,6 +2,7 @@
 #define PAGE_LOGIN_H
 
 #include <QWidget>
+#include "dbconnect.h"
 
 namespace Ui {
 class Page_Login;

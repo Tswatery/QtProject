@@ -13,41 +13,19 @@ private:
     QSqlDatabase db;
 
 public:
-    DbConnect();
+    DbConnect(const std::string& username,
+              const std::string& dataBaseName,
+              const std::string& password):
+        dataBaseName(dataBaseName),
+        username(username),
+        password(password),
+        db(QSqlDatabase::addDatabase("QMYSQL")) {} // 构造函数 避免写get和set函数
 
-    void setDataBaseName(std::string name) {
-        this->dataBaseName = name;
-    }
 
-    void setUserName(std::string username) {
-        this->username = username;
-    }
+    bool connect(); // 连接数据库
 
-    void setPassWord(std::string password) {
-        this->password = password;
-    }
+    bool query(std::string usr, std::string pwd); // 输入用户名和密码 判断是否能登录
 
-    void setQsql() {
-        this->db = QSqlDatabase::addDatabase("QMYSQL");
-    }
-
-    void connect();
-
-    std::string getDataBaseName(){
-        return this->dataBaseName;
-    }
-
-    std::string getUserName(){
-        return this->username;
-    }
-
-    std::string getPassWord() {
-        return this->password;
-    }
-
-    QSqlDatabase getQsql(){
-        return this->db;
-    }
 };
 
 #endif // DBCONNECT_H

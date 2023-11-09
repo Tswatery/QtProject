@@ -4,15 +4,28 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <string>
+#include<QString>
+#include <QDebug>
+#include <QSqlQuery>
 
-void DbConnect::connect(){
-    QStringList list = QSqlDatabase::drivers();
-    qDebug() << list;
+bool DbConnect::connect(){
+    db.setHostName("127.0.0.1");
+    db.setPort(3306);
+    db.setUserName(QString::fromStdString(this->username));
+    db.setDatabaseName(QString::fromStdString(this->dataBaseName));
+    db.setPassword(QString::fromStdString(this->password));
 
-    this->getQsql().setHostName("127.0.0.1");
-    this->getQsql().setPort(3306);
-    this->getQsql().setUserName(this->getUserName());
-    this->getQsql().setPassword(this->getPassWord());
-    this->getQsql().setDatabaseName(this->getDataBaseName());
+    return (db.open() ? true : false);
+}
+
+bool DbConnect::query(std::string usr, std::string pwd){
+    QString sql = "select username, password from users";
+    QSqlQuery query;
+    bool flag = query.exec(sql);
+    while(query.next()){
+        qDebug() << query.value("username").toString()
+                 << query.value("password").toString();
+
+    }
 
 }
