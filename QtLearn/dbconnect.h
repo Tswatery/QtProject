@@ -26,6 +26,8 @@ public:
 
     bool query(std::string usr, std::string pwd); // 输入用户名和密码 判断是否能登录
 
+    void close();
+
 };
 
 #endif // DBCONNECT_H

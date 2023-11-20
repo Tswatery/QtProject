@@ -35,7 +35,7 @@ public:
     QLabel *label;
     QLineEdit *usr;
     QLabel *label_2;
-    QLineEdit *pwd_2;
+    QLineEdit *pwd;
 
     void setupUi(QWidget *Page_Login)
     {
@@ -86,10 +86,11 @@ public:
 
         gridLayout_2->addWidget(label_2, 1, 0, 1, 1);
 
-        pwd_2 = new QLineEdit(widget_2);
-        pwd_2->setObjectName(QStringLiteral("pwd_2"));
+        pwd = new QLineEdit(widget_2);
+        pwd->setObjectName(QStringLiteral("pwd"));
+        pwd->setEchoMode(QLineEdit::Password);
 
-        gridLayout_2->addWidget(pwd_2, 1, 1, 1, 1);
+        gridLayout_2->addWidget(pwd, 1, 1, 1, 1);
 
 
         retranslateUi(Page_Login);

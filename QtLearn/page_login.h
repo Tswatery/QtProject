@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "dbconnect.h"
+#include "mainwindow.h"
 
 namespace Ui {
 class Page_Login;
@@ -25,6 +26,7 @@ signals:
 
 private:
     Ui::Page_Login *ui;
+    MainWindow *mainWindowPtr;
 };
 
 #endif // PAGE_LOGIN_H

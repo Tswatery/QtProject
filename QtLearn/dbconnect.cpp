@@ -23,9 +23,15 @@ bool DbConnect::query(std::string usr, std::string pwd){
     QSqlQuery query;
     bool flag = query.exec(sql);
     while(query.next()){
-        qDebug() << query.value("username").toString()
-                 << query.value("password").toString();
+        QString qusr = query.value("username").toString(), qpwd = query.value("password").toString();
+        if(qusr.toStdString() == usr
+                && qpwd.toStdString() == pwd) return true;
 
     }
+    return false;
 
+}
+
+void DbConnect::close(){
+    db.close();
 }

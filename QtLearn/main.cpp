@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
-
+    Page_Login* pageLoginPtr = new Page_Login();
+    pageLoginPtr->show();
     return a.exec();
 }

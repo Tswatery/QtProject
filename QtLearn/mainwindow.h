@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "page_login.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,9 +15,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots: // 早期版本必须写在 public slots下
+    void acceptSignal();
+
 private:
     Ui::MainWindow *ui;
-    Page_Login m_dlgLogin;
 };
 
 #endif // MAINWINDOW_H
