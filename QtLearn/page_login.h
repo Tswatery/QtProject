@@ -17,16 +17,16 @@ public:
     explicit Page_Login(QWidget *parent = 0);
     ~Page_Login();
 
+signals:
+    void loginSuccess();  // 登陆成功信号
+
 private slots:
-    void on_btn_login_clicked();
+    void attemptLogin();  // 尝试登录槽函数
     void on_btn_exit_clicked();
 
-signals:
-    void sendLoginSuccess();
 
 private:
     Ui::Page_Login *ui;
-    MainWindow *mainWindowPtr;
 };
 
 #endif // PAGE_LOGIN_H

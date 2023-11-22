@@ -3,6 +3,7 @@
 
 #include <string>
 #include <QSqlDatabase>
+#include <QListView>
 
 class DbConnect
 {
@@ -18,13 +19,19 @@ public:
               const std::string& password):
         dataBaseName(dataBaseName),
         username(username),
-        password(password),
-        db(QSqlDatabase::addDatabase("QMYSQL")) {} // 构造函数 避免写get和set函数
+        password(password) {// 构造函数 避免写get和set函数
+        if(QSqlDatabase::contains("qt_sql_default_connection"))
+            db = QSqlDatabase::database("qt_sql_default_connection");
+        else
+            db = QSqlDatabase::addDatabase("QMYSQL");
+    }
 
 
     bool connect(); // 连接数据库
 
     bool query(std::string usr, std::string pwd); // 输入用户名和密码 判断是否能登录
+
+    void query1(std::string cuiSine);
 
     void close();
 

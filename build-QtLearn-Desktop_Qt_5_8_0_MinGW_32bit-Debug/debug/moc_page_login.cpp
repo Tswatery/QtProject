@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Page_Login_t {
     QByteArrayData data[5];
-    char stringdata0[70];
+    char stringdata0[58];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,14 +32,14 @@ struct qt_meta_stringdata_Page_Login_t {
 static const qt_meta_stringdata_Page_Login_t qt_meta_stringdata_Page_Login = {
     {
 QT_MOC_LITERAL(0, 0, 10), // "Page_Login"
-QT_MOC_LITERAL(1, 11, 16), // "sendLoginSuccess"
-QT_MOC_LITERAL(2, 28, 0), // ""
-QT_MOC_LITERAL(3, 29, 20), // "on_btn_login_clicked"
-QT_MOC_LITERAL(4, 50, 19) // "on_btn_exit_clicked"
+QT_MOC_LITERAL(1, 11, 12), // "loginSuccess"
+QT_MOC_LITERAL(2, 24, 0), // ""
+QT_MOC_LITERAL(3, 25, 12), // "attemptLogin"
+QT_MOC_LITERAL(4, 38, 19) // "on_btn_exit_clicked"
 
     },
-    "Page_Login\0sendLoginSuccess\0\0"
-    "on_btn_login_clicked\0on_btn_exit_clicked"
+    "Page_Login\0loginSuccess\0\0attemptLogin\0"
+    "on_btn_exit_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -79,8 +79,8 @@ void Page_Login::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Page_Login *_t = static_cast<Page_Login *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->sendLoginSuccess(); break;
-        case 1: _t->on_btn_login_clicked(); break;
+        case 0: _t->loginSuccess(); break;
+        case 1: _t->attemptLogin(); break;
         case 2: _t->on_btn_exit_clicked(); break;
         default: ;
         }
@@ -89,7 +89,7 @@ void Page_Login::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         void **func = reinterpret_cast<void **>(_a[1]);
         {
             typedef void (Page_Login::*_t)();
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Page_Login::sendLoginSuccess)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Page_Login::loginSuccess)) {
                 *result = 0;
                 return;
             }
@@ -135,7 +135,7 @@ int Page_Login::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void Page_Login::sendLoginSuccess()
+void Page_Login::loginSuccess()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, Q_NULLPTR);
 }

@@ -24,16 +24,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     page_login.cpp \
-    dbconnect.cpp
+    dbconnect.cpp \
+    mainwindow.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     page_login.h \
-    dbconnect.h
+    dbconnect.h \
+    mainwindow.h
 
-FORMS    += mainwindow.ui \
-    page_login.ui
+FORMS    += \
+    page_login.ui \
+    mainwindow.ui
 
 RESOURCES += \
     resource.qrc
