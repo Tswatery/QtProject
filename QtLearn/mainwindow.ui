@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
+    <width>980</width>
     <height>525</height>
    </rect>
   </property>
@@ -16,51 +16,110 @@
   <widget class="QLabel" name="Title">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>130</x>
      <y>60</y>
      <width>161</width>
      <height>51</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font: 16pt &quot;Arial&quot;;</string>
+    <string notr="true">
+font: 16pt &quot;华文行楷&quot;;</string>
    </property>
    <property name="text">
-    <string>点单系统</string>
+    <string>菜单</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QComboBox" name="MultiSelect">
+  <widget class="QTableView" name="AlreadyTable">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>150</y>
-     <width>69</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>徽菜</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>川菜</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QTableView" name="tableView">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
+     <x>600</x>
      <y>140</y>
      <width>361</width>
      <height>301</height>
     </rect>
    </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>100</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;华文行楷&quot;;</string>
+   </property>
+   <property name="text">
+    <string>已点餐品</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>390</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加</string>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="menu">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>120</y>
+     <width>411</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="qmain">
+    <attribute name="title">
+     <string>主餐</string>
+    </attribute>
+    <widget class="QTableView" name="mainview">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>391</width>
+       <height>311</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="qdrink">
+    <attribute name="title">
+     <string>饮品</string>
+    </attribute>
+    <widget class="QTableView" name="tableView">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>11</y>
+       <width>391</width>
+       <height>311</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>

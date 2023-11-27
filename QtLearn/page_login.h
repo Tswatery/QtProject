@@ -24,7 +24,6 @@ private slots:
     void attemptLogin();  // 尝试登录槽函数
     void on_btn_exit_clicked();
 
-
 private:
     Ui::Page_Login *ui;
 };

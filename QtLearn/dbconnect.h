@@ -4,6 +4,7 @@
 #include <string>
 #include <QSqlDatabase>
 #include <QListView>
+#include "mainwindow.h"
 
 class DbConnect
 {
@@ -31,7 +32,7 @@ public:
 
     bool query(std::string usr, std::string pwd); // 输入用户名和密码 判断是否能登录
 
-    void query1(std::string cuiSine);
+    void show_menu(MainWindow* mainptr);
 
     void close();
 

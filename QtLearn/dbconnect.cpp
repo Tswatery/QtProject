@@ -21,7 +21,7 @@ bool DbConnect::connect(){
 bool DbConnect::query(std::string usr, std::string pwd){
     QString sql = "select username, password from users";
     QSqlQuery query;
-    bool flag = query.exec(sql);
+    query.exec(sql);
     while(query.next()){
         QString qusr = query.value("username").toString(), qpwd = query.value("password").toString();
         qDebug() << qusr << qpwd;
@@ -30,29 +30,6 @@ bool DbConnect::query(std::string usr, std::string pwd){
     }
     return false;
 }
-
-void DbConnect::query1(std::string cuiSine){
-    QSqlQuery query;
-
-
-    // 设置mySQL输出不乱码
-    query.exec("set names 'GBK'");
-
-
-    QString sql = "select dishName, description, price, cuisine from menu";
-    bool flag = query.exec(sql);
-
-    (flag ? qDebug() << "成功执行" : qDebug() << "执行失败");
-    while(query.next()) {
-        QString dishName = query.value("dishName").toString(),
-                desc = query.value("description").toString(),
-                price = query.value("price").toString();
-        std::string cuisine = query.value("cuisine").toString().toStdString();
-        if(cuisine == cuiSine)
-            qDebug() << dishName << desc << price;
-    }
-}
-
 void DbConnect::close(){
     db.close();
 }

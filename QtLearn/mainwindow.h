@@ -14,9 +14,7 @@ class MainWindow : public QWidget
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-private slots:
-    void handleCuisineSelected(const QString &cuisine);
+    void showMenu();
 
 private:
     Ui::MainWindow *ui;
