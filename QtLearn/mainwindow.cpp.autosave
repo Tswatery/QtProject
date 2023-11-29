@@ -80,7 +80,7 @@ void MainWindow::showMenu()
             ui->mainview->setIndexWidget(ui->mainview->model()->index(row, 5), widget5);
             // 给第4列也装上checkbox
             QWidget* widget4 = new QWidget();
-            QCheckBox* checkBox4 = new QCheckBox("√");
+            QCheckBox* checkBox4 = new QCheckBox();
             QHBoxLayout* hLayout4 = new QHBoxLayout();
             hLayout4->addWidget(checkBox4);
             hLayout4->setMargin(0);
