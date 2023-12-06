@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
-    <height>525</height>
+    <width>1136</width>
+    <height>679</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,20 +33,20 @@ font: 16pt &quot;华文行楷&quot;;</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QTableView" name="AlreadyTable">
+  <widget class="QTableView" name="Order">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>60</y>
+     <x>750</x>
+     <y>70</y>
      <width>361</width>
-     <height>151</height>
+     <height>521</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>600</x>
+     <x>880</x>
      <y>20</y>
      <width>91</width>
      <height>31</height>
@@ -67,8 +67,8 @@ font: 16pt &quot;华文行楷&quot;;</string>
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>561</width>
-     <height>481</height>
+     <width>481</width>
+     <height>281</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -82,12 +82,14 @@ font: 16pt &quot;华文行楷&quot;;</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
-       <width>531</width>
-       <height>431</height>
+       <y>0</y>
+       <width>461</width>
+       <height>251</height>
       </rect>
      </property>
     </widget>
+    <zorder>mainview</zorder>
+    <zorder>Comment</zorder>
    </widget>
    <widget class="QWidget" name="qdrink">
     <attribute name="title">
@@ -108,12 +110,12 @@ font: 16pt &quot;华文行楷&quot;;</string>
     </widget>
    </widget>
   </widget>
-  <widget class="QTableView" name="AlreadyTable_2">
+  <widget class="QTableView" name="Comment">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>280</y>
-     <width>361</width>
+     <x>30</x>
+     <y>360</y>
+     <width>691</width>
      <height>231</height>
     </rect>
    </property>
@@ -121,8 +123,8 @@ font: 16pt &quot;华文行楷&quot;;</string>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>240</y>
+     <x>220</x>
+     <y>320</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -140,8 +142,8 @@ font: 16pt &quot;华文行楷&quot;;</string>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>790</x>
-     <y>220</y>
+     <x>910</x>
+     <y>600</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -156,14 +158,140 @@ font: 16pt &quot;华文行楷&quot;;</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="Sum">
    <property name="geometry">
     <rect>
-     <x>860</x>
-     <y>220</y>
+     <x>1010</x>
+     <y>600</y>
      <width>101</width>
      <height>20</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="ShowCommentBtn">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>620</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>查看评价</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="CommentId">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>620</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>620</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;华文行楷&quot;;</string>
+   </property>
+   <property name="text">
+    <string>菜品序号</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="ShowCommentBtn_2">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>280</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="MenuId">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>100</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>100</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;华文行楷&quot;;</string>
+   </property>
+   <property name="text">
+    <string>菜品序号</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>150</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;华文行楷&quot;;</string>
+   </property>
+   <property name="text">
+    <string>份数</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="MenuNum">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>150</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="ShowCommentBtn_3">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>280</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>删除</string>
    </property>
   </widget>
  </widget>
