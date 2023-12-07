@@ -26,6 +26,8 @@ public:
 private slots:
     void on_ShowCommentBtn_2_clicked();
 
+    void on_ShowCommentBtn_3_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStandardItemModel* modelOrder, *modelMenu, *modelDrink;

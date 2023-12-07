@@ -112,9 +112,9 @@ void MainWindow::DataBaseInit()
 
 void MainWindow::on_ShowCommentBtn_2_clicked()
 {
-    DataBaseInit();
+    DataBaseInit(); // 打开数据库
     QString MenuId = ui->MenuId->text();
-    QString quantity = ui->MenuNum->text();
+    QString quantity = ui->MenuNum->text(); // 获取两种信息
     QSqlQuery query(db);
     query.exec("set names 'GBK'");
     QString qstr = QString("select dishName, price, cuisine from menu where id = %1").arg(MenuId);
@@ -123,23 +123,24 @@ void MainWindow::on_ShowCommentBtn_2_clicked()
     QString dishName = query.value("dishName").toString(),
             price = query.value("price").toString(),
             cuisine = query.value("cuisine").toString();
+    // 查询对应的数据
 
 
-
-    qstr = QString("insert into orders (TableNumber, DishName, Price, Quantity) "
-                   "values(%1, '%2', %3, %4)")
-                    .arg(tableId).arg(dishName).arg(price).arg(quantity);
+    qstr = QString("insert into orders (TableNumber, DishName, Price, Quantity, MenuId) "
+                   "values(%1, '%2', %3, %4, %5)")
+                    .arg(tableId).arg(dishName).arg(price).arg(quantity).arg(MenuId);
     query.exec(qstr);
+    // 向数据库中插入数据
 
     qstr = QString("select DishName, Price, Quantity from orders where TableNumber = %1").arg(tableId);
-    bool flag = query.exec(qstr);
-    qDebug() << qstr << flag << query.lastError();
-
+    query.exec(qstr);
     int row = 0;
+    double SumPrice = 0;
     while(query.next()) {
         QString DishName = query.value("DishName").toString(),
                 Price = query.value("Price").toString(),
                 Quantity = query.value("Quantity").toString();
+        SumPrice += Price.toDouble() * Quantity.toDouble();
         modelOrder->setItem(row, 0, new QStandardItem(DishName));
         modelOrder->setItem(row, 1, new QStandardItem(Price));
         modelOrder->setItem(row, 2, new QStandardItem(Quantity));
@@ -149,5 +150,27 @@ void MainWindow::on_ShowCommentBtn_2_clicked()
         row ++;
         qDebug() << DishName << Price << Quantity;
     }
+    QString SumPriceString = QString::number(SumPrice) + "元";
+    ui->Sum->setText(SumPriceString);
+    db.close();
+}
+
+void MainWindow::on_ShowCommentBtn_3_clicked()
+{
+    DataBaseInit();
+    ui->MenuNum->clear();
+    QString MenuId = ui->MenuId->text();
+    QSqlQuery query(db);
+    QString qstr = QString("select sum(Price * Quantity) from orders where MenuId = %1").arg(MenuId);
+    query.exec(qstr);
+    query.first();
+    QString SumPrice = query.value(0).toString();
+    QString prePrice = ui->Sum->text();
+    prePrice.chop(1);
+    qDebug() << prePrice;
+    QString SumPriceString = QString::number(prePrice.toDouble() - SumPrice.toDouble()) + "元";
+    ui->Sum->setText(SumPriceString);
+    qstr = QString("delete from orders where Table_name = %1").arg(MenuId);
+    query.exec(qstr);
     db.close();
 }
