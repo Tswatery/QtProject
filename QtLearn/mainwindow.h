@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QStandardItemModel>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 namespace Ui {
 class MainWindow;
@@ -15,8 +17,11 @@ class MainWindow : public QWidget
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
     void showMenu();
     void init(); // 初始化界面
+
+    void DataBaseInit();
 
 private slots:
     void on_ShowCommentBtn_2_clicked();
@@ -24,6 +29,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QStandardItemModel* modelOrder, *modelMenu, *modelDrink;
+    int tableId;
+    QSqlDatabase db;
 };
 
 #endif // MAINWINDOW_H
