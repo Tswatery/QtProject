@@ -35,6 +35,8 @@ void Page_Login::attemptLogin(){
         // 登陆成功进入主界面
         qDebug() << "Login success";
         MainWindow* mainWindowPtr = new MainWindow();
+        mainWindowPtr->setUserName(stdusr);
+        mainWindowPtr->getVipLevel();
         mainWindowPtr->show();
         this->close();
     }else {

@@ -33,6 +33,7 @@ void MainWindow::showMenu()
     modelDrink = new QStandardItemModel();
     modelMenu = new QStandardItemModel();
     modelOrder = new QStandardItemModel();
+    modelComment = new QStandardItemModel();
     QSqlQuery query(db);
     query.exec("set names 'GBK'");
     // 建立数据库连接并设置中文不乱码
@@ -52,7 +53,7 @@ void MainWindow::showMenu()
             modelMenu->item(row, 2)->setTextAlignment(Qt::AlignCenter);
             modelMenu->item(row, 3)->setTextAlignment(Qt::AlignCenter);
             row ++;
-            qDebug() << dishName << cuisine << price;
+//            qDebug() << dishName << cuisine << price;
         }
     }else {
         qDebug() << "database menu connect error";
@@ -61,7 +62,7 @@ void MainWindow::showMenu()
 }
 
 void MainWindow::init()
-{
+{  
     ui->menu->setCurrentIndex(0);
     modelMenu->setHorizontalHeaderLabels(QStringList() << "序号"<< "菜名" << "价格" << "菜系");
     ui->mainview->setModel(modelMenu);
@@ -89,6 +90,20 @@ void MainWindow::init()
       "}"
     ); // 给列表添加样式表
 
+    modelComment->setHorizontalHeaderLabels(QStringList() << "评价人" << "评价" << "等级" << "评价时间");
+    ui->Comment->setModel(modelComment);
+    ui->Comment->setColumnWidth(1, 285);
+    ui->Comment->setColumnWidth(3, 185);
+    ui->Comment->horizontalHeader()->setStyleSheet(
+      "QHeaderView::section{"
+      "border-top:0px solid #E5E5E5;"
+      "border-left:0px solid #E5E5E5;"
+      "border-right:0.5px solid #E5E5E5;"
+      "border-bottom: 0.5px solid #E5E5E5;"
+      "background-color:white;"
+      "padding:4px;"
+      "}"
+    ); // 给列表添加样式表
 }
 
 void MainWindow::DataBaseInit()
@@ -103,6 +118,21 @@ void MainWindow::DataBaseInit()
     db.setUserName("root");
     db.setPassword("123456");
     db.open();
+}
+
+// 在vipLevel中添加等级
+
+void MainWindow::getVipLevel()
+{
+    DataBaseInit();
+    QString qname = QString::fromStdString(this->name);
+    QString qstr = QString("select vip_level from users where username = '%1'").arg(qname);
+    QSqlQuery query(db);
+    query.exec(qstr);
+    query.first();
+    QString vipLevel = query.value("vip_level").toString();
+    ui->vipLevel->setText(QString("vip ") + vipLevel);
+    db.close();
 }
 
 /*
@@ -173,4 +203,37 @@ void MainWindow::on_ShowCommentBtn_3_clicked()
     qstr = QString("delete from orders where Table_name = %1").arg(MenuId);
     query.exec(qstr);
     db.close();
+}
+
+
+// 点餐评价
+void MainWindow::on_ShowCommentBtn_clicked()
+{
+    DataBaseInit();
+    QString Menuid = ui->CommentId->text();
+    QSqlQuery query(db);
+    QString qstr = QString(
+                "select CommentName, CommentContent, Rating, CommentDate from MenuComments where MenuId = %1"
+                ).arg(Menuid);
+    qDebug() << QString("展示评论") << qstr << query.lastError();
+    query.exec("set names 'GBK'");
+    query.exec(qstr);
+    int row = 0;
+    while(query.next()) {
+        QString CommentDate = query.value("CommentDate").toString(),
+                CommentName = query.value("CommentName").toString(),
+                CommentContent = query.value("CommentContent").toString(),
+                Rating = query.value("Rating").toString();
+        modelComment->setItem(row, 3, new QStandardItem(CommentDate));
+        modelComment->setItem(row, 0, new QStandardItem(CommentName));
+        modelComment->setItem(row, 1, new QStandardItem(CommentContent));
+        modelComment->setItem(row, 2, new QStandardItem(Rating));
+        modelComment->item(row, 0)->setTextAlignment(Qt::AlignCenter);
+        modelComment->item(row, 1)->setTextAlignment(Qt::AlignCenter);
+        modelComment->item(row, 2)->setTextAlignment(Qt::AlignCenter);
+        modelComment->item(row, 3)->setTextAlignment(Qt::AlignCenter);
+        row ++;
+    }
+    db.close();
+
 }

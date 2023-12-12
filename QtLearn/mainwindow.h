@@ -23,16 +23,25 @@ public:
 
     void DataBaseInit();
 
+    void setUserName(std::string name) {
+        this->name = name;
+    }
+
+    void getVipLevel();
+
 private slots:
     void on_ShowCommentBtn_2_clicked();
 
     void on_ShowCommentBtn_3_clicked();
 
+    void on_ShowCommentBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
-    QStandardItemModel* modelOrder, *modelMenu, *modelDrink;
+    QStandardItemModel* modelOrder, *modelMenu, *modelDrink, *modelComment;
     int tableId;
     QSqlDatabase db;
+    std::string name;
 };
 
 #endif // MAINWINDOW_H

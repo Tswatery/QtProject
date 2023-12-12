@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -47,6 +48,9 @@ public:
     QLabel *label_6;
     QLineEdit *MenuNum;
     QPushButton *ShowCommentBtn_3;
+    QLineEdit *vipLevel;
+    QLabel *label_7;
+    QComboBox *SortCombine;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -74,14 +78,13 @@ public:
         qmain->setObjectName(QStringLiteral("qmain"));
         mainview = new QTableView(qmain);
         mainview->setObjectName(QStringLiteral("mainview"));
-        mainview->setGeometry(QRect(10, 0, 461, 251));
+        mainview->setGeometry(QRect(0, 0, 471, 251));
         menu->addTab(qmain, QString());
-        mainview->raise();
         qdrink = new QWidget();
         qdrink->setObjectName(QStringLiteral("qdrink"));
         tableView = new QTableView(qdrink);
         tableView->setObjectName(QStringLiteral("tableView"));
-        tableView->setGeometry(QRect(5, 11, 541, 431));
+        tableView->setGeometry(QRect(0, 0, 471, 251));
         tableView->setStyleSheet(QStringLiteral(""));
         menu->addTab(qdrink, QString());
         Comment = new QTableView(MainWindow);
@@ -133,6 +136,17 @@ public:
         ShowCommentBtn_3 = new QPushButton(MainWindow);
         ShowCommentBtn_3->setObjectName(QStringLiteral("ShowCommentBtn_3"));
         ShowCommentBtn_3->setGeometry(QRect(620, 280, 75, 23));
+        vipLevel = new QLineEdit(MainWindow);
+        vipLevel->setObjectName(QStringLiteral("vipLevel"));
+        vipLevel->setGeometry(QRect(640, 30, 51, 20));
+        label_7 = new QLabel(MainWindow);
+        label_7->setObjectName(QStringLiteral("label_7"));
+        label_7->setGeometry(QRect(540, 30, 91, 21));
+        label_7->setStyleSheet(QString::fromUtf8("font: 12pt \"\345\215\216\346\226\207\350\241\214\346\245\267\";"));
+        label_7->setAlignment(Qt::AlignCenter);
+        SortCombine = new QComboBox(MainWindow);
+        SortCombine->setObjectName(QStringLiteral("SortCombine"));
+        SortCombine->setGeometry(QRect(390, 620, 81, 22));
 
         retranslateUi(MainWindow);
 
@@ -157,6 +171,14 @@ public:
         label_5->setText(QApplication::translate("MainWindow", "\350\217\234\345\223\201\345\272\217\345\217\267", Q_NULLPTR));
         label_6->setText(QApplication::translate("MainWindow", "\344\273\275\346\225\260", Q_NULLPTR));
         ShowCommentBtn_3->setText(QApplication::translate("MainWindow", "\345\210\240\351\231\244", Q_NULLPTR));
+        label_7->setText(QApplication::translate("MainWindow", "\346\202\250\345\245\275\357\274\214\345\260\212\350\264\265\347\232\204", Q_NULLPTR));
+        SortCombine->clear();
+        SortCombine->insertItems(0, QStringList()
+         << QApplication::translate("MainWindow", "\350\257\204\344\273\267\345\215\207\345\272\217", Q_NULLPTR)
+         << QApplication::translate("MainWindow", "\350\257\204\344\273\267\351\231\215\345\272\217", Q_NULLPTR)
+         << QApplication::translate("MainWindow", "\346\227\266\351\227\264\345\215\207\345\272\217", Q_NULLPTR)
+         << QApplication::translate("MainWindow", "\346\227\266\351\227\264\351\231\215\345\272\217", Q_NULLPTR)
+        );
     } // retranslateUi
 
 };
