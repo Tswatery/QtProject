@@ -332,12 +332,12 @@ font: 16pt &quot;华文行楷&quot;;</string>
    </property>
    <item>
     <property name="text">
-     <string>评价升序</string>
+     <string>评分升序</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>评价降序</string>
+     <string>评分降序</string>
     </property>
    </item>
    <item>

@@ -11,6 +11,7 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QSqlError>
+#include <regex>
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
@@ -38,33 +39,37 @@ void MainWindow::showMenu()
     query.exec("set names 'GBK'");
     // 建立数据库连接并设置中文不乱码
     int row = 0;
-    if(query.exec("select id, dishName, price, cuisine from menu")){
+    if(query.exec("select id, dishName, price, cuisine, rating from menu order by rating desc")){ // 降序
         while(query.next()){
             QString id = query.value("id").toString(),
                     dishName = query.value("dishName").toString(),
                     price = query.value("price").toString(),
-                    cuisine = query.value("cuisine").toString();
+                    cuisine = query.value("cuisine").toString(),
+                    rating = query.value("rating").toString();
             modelMenu->setItem(row, 0, new QStandardItem(id));
             modelMenu->setItem(row, 1, new QStandardItem(dishName));
             modelMenu->setItem(row, 2, new QStandardItem(price));
             modelMenu->setItem(row, 3, new QStandardItem(cuisine));
+            modelMenu->setItem(row, 4, new QStandardItem(rating));
             modelMenu->item(row, 0)->setTextAlignment(Qt::AlignCenter);
             modelMenu->item(row, 1)->setTextAlignment(Qt::AlignCenter);
             modelMenu->item(row, 2)->setTextAlignment(Qt::AlignCenter);
             modelMenu->item(row, 3)->setTextAlignment(Qt::AlignCenter);
+            modelMenu->item(row, 4)->setTextAlignment(Qt::AlignCenter);
             row ++;
-//            qDebug() << dishName << cuisine << price;
         }
     }else {
         qDebug() << "database menu connect error";
     }
+    for(int i = 0; i < 5; ++ i)
+        modelMenu->item(i, 1)->setForeground(QBrush(QColor(255, 99, 71)));
     db.close();
 }
 
 void MainWindow::init()
 {  
     ui->menu->setCurrentIndex(0);
-    modelMenu->setHorizontalHeaderLabels(QStringList() << "序号"<< "菜名" << "价格" << "菜系");
+    modelMenu->setHorizontalHeaderLabels(QStringList() << "序号"<< "菜名" << "价格" << "菜系" << "评分");
     ui->mainview->setModel(modelMenu);
     ui->mainview->horizontalHeader()->setStyleSheet(
       "QHeaderView::section{"
@@ -211,11 +216,30 @@ void MainWindow::on_ShowCommentBtn_clicked()
 {
     DataBaseInit();
     QString Menuid = ui->CommentId->text();
+    int option = ui->SortCombine->currentIndex();
     QSqlQuery query(db);
     QString qstr = QString(
-                "select CommentName, CommentContent, Rating, CommentDate from MenuComments where MenuId = %1"
+                "select CommentName, CommentContent, Rating, CommentDate from MenuComments where MenuId = %1 "
                 ).arg(Menuid);
-    qDebug() << QString("展示评论") << qstr << query.lastError();
+    QString opRating = "order by Rating", opDate = "order by CommentDate";
+    switch (option) {
+    case 0:
+        qstr += opRating + " asc";
+        break;
+    case 1:
+        qstr += opRating + " desc";
+        break;
+    case 2:
+        qstr += opDate + " asc";
+        break;
+    case 3:
+        qstr += opDate + " desc";
+        break;
+    default:
+        break;
+    }
+
+    qDebug() << QString("展示评论") << qstr << option << query.lastError() ;
     query.exec("set names 'GBK'");
     query.exec(qstr);
     int row = 0;
