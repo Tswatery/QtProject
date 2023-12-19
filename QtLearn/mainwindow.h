@@ -15,19 +15,15 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(std::string& username, QWidget *parent = 0);
     ~MainWindow();
 
     void showMenu();
     void init(); // 初始化界面
-
     void DataBaseInit();
-
-    void setUserName(std::string name) {
-        this->name = name;
-    }
-
     void getVipLevel();
+    void updateVipLevel();
+    void showRecentOrder();
 
 private slots:
     void on_ShowCommentBtn_2_clicked();
@@ -35,6 +31,8 @@ private slots:
     void on_ShowCommentBtn_3_clicked();
 
     void on_ShowCommentBtn_clicked();
+
+    void on_Pay_clicked();
 
 private:
     Ui::MainWindow *ui;

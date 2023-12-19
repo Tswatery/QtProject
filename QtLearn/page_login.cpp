@@ -25,8 +25,6 @@ void Page_Login::attemptLogin(){
     //从line中获取用户名与密码
     QString pwd = ui->pwd->text();
     QString usr = ui->usr->text();
-
-
     // 数据库查找用户名与密码
     DbConnect* db = new DbConnect("root", "myqt_project", "123456");
     (db->connect()) ? qDebug() << "连接成功" : qDebug() << "连接失败"; // 打印日志是否正确连接
@@ -34,9 +32,7 @@ void Page_Login::attemptLogin(){
     if(db->query(stdusr, stdpwd)) {
         // 登陆成功进入主界面
         qDebug() << "Login success";
-        MainWindow* mainWindowPtr = new MainWindow();
-        mainWindowPtr->setUserName(stdusr);
-        mainWindowPtr->getVipLevel();
+        MainWindow* mainWindowPtr = new MainWindow(stdusr);
         mainWindowPtr->show();
         this->close();
     }else {

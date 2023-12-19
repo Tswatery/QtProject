@@ -11,16 +11,20 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QSqlError>
-#include <regex>
+#include <paybill.h>
+#include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(std::string& username, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->name = username;
+    getVipLevel();
     showMenu();
     init();
     tableId = 2;
+    showRecentOrder();
 }
 
 MainWindow::~MainWindow()
@@ -94,21 +98,6 @@ void MainWindow::init()
       "padding:4px;"
       "}"
     ); // 给列表添加样式表
-
-    modelComment->setHorizontalHeaderLabels(QStringList() << "评价人" << "评价" << "等级" << "评价时间");
-    ui->Comment->setModel(modelComment);
-    ui->Comment->setColumnWidth(1, 285);
-    ui->Comment->setColumnWidth(3, 185);
-    ui->Comment->horizontalHeader()->setStyleSheet(
-      "QHeaderView::section{"
-      "border-top:0px solid #E5E5E5;"
-      "border-left:0px solid #E5E5E5;"
-      "border-right:0.5px solid #E5E5E5;"
-      "border-bottom: 0.5px solid #E5E5E5;"
-      "background-color:white;"
-      "padding:4px;"
-      "}"
-    ); // 给列表添加样式表
 }
 
 void MainWindow::DataBaseInit()
@@ -125,10 +114,11 @@ void MainWindow::DataBaseInit()
     db.open();
 }
 
-// 在vipLevel中添加等级
 
+// 在vipLevel中添加等级 并更新
 void MainWindow::getVipLevel()
 {
+    updateVipLevel();
     DataBaseInit();
     QString qname = QString::fromStdString(this->name);
     QString qstr = QString("select vip_level from users where username = '%1'").arg(qname);
@@ -140,50 +130,157 @@ void MainWindow::getVipLevel()
     db.close();
 }
 
+void MainWindow::updateVipLevel()
+{
+    DataBaseInit();
+    QSqlQuery query(db);
+    QString qstr = QString("update users set vip_level = "
+                           "case "
+                           "when costmoney <= 1000 then 1 "
+                           "when costmoney <= 5000 then 2 "
+                           "when costmoney <= 10000 then 3 "
+                           "else 4 "
+                           "end "
+                           "WHERE role != 'admin';");
+    qDebug() << qstr;
+    bool flag = query.exec(qstr);
+    qDebug() << "更新vip等级 " << flag;
+    db.close();
+}
+
+
+/*
+ * 点餐记忆 找到最近一次该用户的order
+ * 有两种情况：
+ * 1. status为0的话 就说明该用户还有订单没有支付 就把这次的订单全部展示出来
+ * 2. status为1的话 就说明该用户是再次消费 因此可以提供点餐记忆 快速生成上次的订单
+*/
+void MainWindow::showRecentOrder(){
+    DataBaseInit();
+    QSqlQuery query(db);
+    query.exec("set names 'GBK'");
+    QString qstr = "select PaymentStatus from orders order by OrderTime desc";
+    bool flag = query.exec(qstr);
+    query.first();
+    QString PaymentStatus = query.value("PaymentStatus").toString();
+        qDebug() << "点餐记忆获取paymentstatus " << flag << PaymentStatus;
+    if(! QString::compare(PaymentStatus, "0")) {
+        // 如果没有付款 此时付款状态为0 表示未付款
+        qstr = QString("select DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
+        bool flag = query.exec(qstr);
+        qDebug() << "点餐记忆未付款 " << flag << qstr;
+        int row = 0;
+        double SumPrice = 0;
+        while(query.next()) {
+            QString DishName = query.value("DishName").toString(),
+                    Price = query.value("Price").toString(),
+                    Quantity = query.value("Quantity").toString(),
+                    CustomerNote = query.value("CustomerNote").toString();
+            SumPrice += Price.toDouble() * Quantity.toDouble();
+            modelOrder->setItem(row, 0, new QStandardItem(DishName));
+            modelOrder->setItem(row, 1, new QStandardItem(Price));
+            modelOrder->setItem(row, 2, new QStandardItem(Quantity));
+            modelOrder->setItem(row, 3, new QStandardItem(CustomerNote));
+            modelOrder->item(row, 0)->setTextAlignment(Qt::AlignCenter);
+            modelOrder->item(row, 1)->setTextAlignment(Qt::AlignCenter);
+            modelOrder->item(row, 2)->setTextAlignment(Qt::AlignCenter);
+            modelOrder->item(row, 3)->setTextAlignment(Qt::AlignCenter);
+            row ++;
+        }
+        QString SumPriceString = QString::number(SumPrice) + "元";
+        ui->Sum->setText(SumPriceString);
+    }else {
+        // 此时付款状态为1 表示已付款
+        QMessageBox::StandardButton reply = QMessageBox::question(
+                    nullptr, "上次点单", "系统检测到您上次点了本店的招牌菜, 本次是否还需要尝尝?",
+                    QMessageBox::Yes | QMessageBox::No);
+        if(reply == QMessageBox::Yes) {
+            qDebug() << "点餐记忆 yes";
+            // 获取最近一次点单
+            qstr = QString("select TableNumber, DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
+            bool flag = query.exec(qstr);
+            int row = 0;
+            double SumPrice = 0;
+            QString lastTableNumber;
+            qDebug() << "需要点餐记忆 " << flag << qstr;
+            while(query.next()) {
+                QString DishName = query.value("DishName").toString(),
+                        Price = query.value("Price").toString(),
+                        Quantity = query.value("Quantity").toString(),
+                        CustomerNote = query.value("CustomerNote").toString(),
+                        TableNumber = query.value("TableNumber").toString();
+                if(lastTableNumber.isEmpty() || QString::compare(lastTableNumber, TableNumber) == 0) {
+                    // 如果 lastTableNumber是空的 说明是第一次查 要更新 如果不是空的就说明lastTableNumber与TableNumber相等
+                    lastTableNumber = TableNumber;
+                }else break;
+                SumPrice += Price.toDouble() * Quantity.toDouble();
+                modelOrder->setItem(row, 0, new QStandardItem(DishName));
+                modelOrder->setItem(row, 1, new QStandardItem(Price));
+                modelOrder->setItem(row, 2, new QStandardItem(Quantity));
+                modelOrder->setItem(row, 3, new QStandardItem(CustomerNote));
+                modelOrder->item(row, 0)->setTextAlignment(Qt::AlignCenter);
+                modelOrder->item(row, 1)->setTextAlignment(Qt::AlignCenter);
+                modelOrder->item(row, 2)->setTextAlignment(Qt::AlignCenter);
+                modelOrder->item(row, 3)->setTextAlignment(Qt::AlignCenter);
+                row ++;
+                qDebug() << DishName << Price << Quantity;
+            }
+            QString SumPriceString = QString::number(SumPrice) + "元";
+            ui->Sum->setText(SumPriceString);
+            // 将付款状态改为0 以及时间戳改成最近的时间
+            qstr = QString("update orders set PatmentStatus = 0, OrderTime = NOW() where TableNumber = %1").arg(lastTableNumber);
+        }
+    }
+    db.close();
+}
+
+
 /*
     对于添加的菜品 应该给每一桌都新建一张表 这样就方便查询和删除
-
 */
-
 void MainWindow::on_ShowCommentBtn_2_clicked()
 {
     DataBaseInit(); // 打开数据库
     QString MenuId = ui->MenuId->text();
     QString quantity = ui->MenuNum->text(); // 获取两种信息
+    QString CommentContent = ui->MenuPS->text();
     QSqlQuery query(db);
     query.exec("set names 'GBK'");
-    QString qstr = QString("select dishName, price, cuisine from menu where id = %1").arg(MenuId);
+    QString qstr = QString("select dishName, price from menu where id = %1").arg(MenuId);
     query.exec(qstr);
     query.first();
     QString dishName = query.value("dishName").toString(),
-            price = query.value("price").toString(),
-            cuisine = query.value("cuisine").toString();
+            price = query.value("price").toString();
     // 查询对应的数据
 
 
-    qstr = QString("insert into orders (TableNumber, DishName, Price, Quantity, MenuId) "
-                   "values(%1, '%2', %3, %4, %5)")
-                    .arg(tableId).arg(dishName).arg(price).arg(quantity).arg(MenuId);
-    query.exec(qstr);
+    qstr = QString("insert into orders (TableNumber, DishName, Price, Quantity, MenuId, CustomerNote, customername) "
+                   "values(%1, '%2', %3, %4, %5, '%6', '%7')")
+                    .arg(tableId).arg(dishName).arg(price).arg(quantity).arg(MenuId).arg(CommentContent).arg(QString::fromStdString(this->name));
+    bool flag = query.exec(qstr);
     // 向数据库中插入数据
+    qDebug() << "向数据库中插入数据 " << flag << qstr;
 
-    qstr = QString("select DishName, Price, Quantity from orders where TableNumber = %1").arg(tableId);
-    query.exec(qstr);
+    qstr = QString("select DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
+    flag = query.exec(qstr);
+    qDebug() << "插入后查询数据 " << flag << qstr;
     int row = 0;
     double SumPrice = 0;
     while(query.next()) {
         QString DishName = query.value("DishName").toString(),
                 Price = query.value("Price").toString(),
-                Quantity = query.value("Quantity").toString();
+                Quantity = query.value("Quantity").toString(),
+                CustomerNote = query.value("CustomerNote").toString();
         SumPrice += Price.toDouble() * Quantity.toDouble();
         modelOrder->setItem(row, 0, new QStandardItem(DishName));
         modelOrder->setItem(row, 1, new QStandardItem(Price));
         modelOrder->setItem(row, 2, new QStandardItem(Quantity));
+        modelOrder->setItem(row, 3, new QStandardItem(CustomerNote));
         modelOrder->item(row, 0)->setTextAlignment(Qt::AlignCenter);
         modelOrder->item(row, 1)->setTextAlignment(Qt::AlignCenter);
         modelOrder->item(row, 2)->setTextAlignment(Qt::AlignCenter);
+        modelOrder->item(row, 3)->setTextAlignment(Qt::AlignCenter);
         row ++;
-        qDebug() << DishName << Price << Quantity;
     }
     QString SumPriceString = QString::number(SumPrice) + "元";
     ui->Sum->setText(SumPriceString);
@@ -214,6 +311,21 @@ void MainWindow::on_ShowCommentBtn_3_clicked()
 // 点餐评价
 void MainWindow::on_ShowCommentBtn_clicked()
 {
+    modelComment->clear();
+    modelComment->setHorizontalHeaderLabels(QStringList() << "评价人" << "评价" << "等级" << "评价时间");
+    ui->Comment->setModel(modelComment);
+    ui->Comment->setColumnWidth(1, 285);
+    ui->Comment->setColumnWidth(3, 185);
+    ui->Comment->horizontalHeader()->setStyleSheet(
+      "QHeaderView::section{"
+      "border-top:0px solid #E5E5E5;"
+      "border-left:0px solid #E5E5E5;"
+      "border-right:0.5px solid #E5E5E5;"
+      "border-bottom: 0.5px solid #E5E5E5;"
+      "background-color:white;"
+      "padding:4px;"
+      "}"
+    ); // 给列表添加样式表
     DataBaseInit();
     QString Menuid = ui->CommentId->text();
     int option = ui->SortCombine->currentIndex();
@@ -259,5 +371,13 @@ void MainWindow::on_ShowCommentBtn_clicked()
         row ++;
     }
     db.close();
+}
 
+
+// 结账  vip1 1000元以内 95折 vip2 5000元以内 88折 vip3 10000元以内 8折 vip4 75折
+void MainWindow::on_Pay_clicked(){
+    int vipLevel = ui->vipLevel->text().toStdString().back() - '0';
+    payBill* paybill = new payBill(this->name, vipLevel);
+    paybill->show();
+    this->close();
 }
