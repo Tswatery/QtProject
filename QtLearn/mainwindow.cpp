@@ -13,6 +13,7 @@
 #include <QSqlError>
 #include <paybill.h>
 #include <QMessageBox>
+#include <QSqlRecord>
 
 MainWindow::MainWindow(std::string& username, QWidget *parent) :
     QWidget(parent),
@@ -20,10 +21,11 @@ MainWindow::MainWindow(std::string& username, QWidget *parent) :
 {
     ui->setupUi(this);
     this->name = username;
+    updateMenu();
+    getTableId();
     getVipLevel();
     showMenu();
     init();
-    tableId = 2;
     showRecentOrder();
 }
 
@@ -67,6 +69,30 @@ void MainWindow::showMenu()
     }
     for(int i = 0; i < 5; ++ i)
         modelMenu->item(i, 1)->setForeground(QBrush(QColor(255, 99, 71)));
+
+    row = 0;
+    QString qstr = "select id, dishName, price, rating from menu where type = 'drink' order by rating desc";
+    bool flag = query.exec(qstr);
+    qDebug() << "饮品 " << flag << qstr;
+    if(flag){
+        while(query.next()){
+            QString id = query.value("id").toString(),
+                    dishName = query.value("dishName").toString(),
+                    price = query.value("price").toString(),
+                    rating = query.value("rating").toString();
+            modelDrink->setItem(row, 0, new QStandardItem(id));
+            modelDrink->setItem(row, 1, new QStandardItem(dishName));
+            modelDrink->setItem(row, 2, new QStandardItem(price));
+            modelDrink->setItem(row, 3, new QStandardItem(rating));
+            modelDrink->item(row, 0)->setTextAlignment(Qt::AlignCenter);
+            modelDrink->item(row, 1)->setTextAlignment(Qt::AlignCenter);
+            modelDrink->item(row, 2)->setTextAlignment(Qt::AlignCenter);
+            modelDrink->item(row, 3)->setTextAlignment(Qt::AlignCenter);
+            row ++;
+        }
+    }
+    for(int i = 0; i < 5; ++ i)
+        modelDrink->item(i, 1)->setForeground(QBrush(QColor(255, 99, 71)));
     db.close();
 }
 
@@ -85,6 +111,21 @@ void MainWindow::init()
       "padding:4px;"
       "}"
     ); // 给列表添加样式表
+
+
+    modelDrink->setHorizontalHeaderLabels(QStringList() << "序号" << "饮品名" << "价格" << "评分");
+    ui->tableView->setModel(modelDrink);
+    ui->tableView->horizontalHeader()->setStyleSheet(
+      "QHeaderView::section{"
+      "border-top:0px solid #E5E5E5;"
+      "border-left:0px solid #E5E5E5;"
+      "border-right:0.5px solid #E5E5E5;"
+      "border-bottom: 0.5px solid #E5E5E5;"
+      "background-color:white;"
+      "padding:4px;"
+      "}"
+    ); // 给列表添加样式表
+
 
     modelOrder->setHorizontalHeaderLabels(QStringList() << "菜名" << "价格" << "份数" << "备注");
     ui->Order->setModel(modelOrder);
@@ -159,19 +200,22 @@ void MainWindow::showRecentOrder(){
     DataBaseInit();
     QSqlQuery query(db);
     query.exec("set names 'GBK'");
-    QString qstr = "select PaymentStatus from orders order by OrderTime desc";
+    QString qstr = QString("select PaymentStatus from orders where customername = '%1' order by OrderTime desc").arg(QString::fromStdString(this->name));
     bool flag = query.exec(qstr);
     query.first();
     QString PaymentStatus = query.value("PaymentStatus").toString();
-        qDebug() << "点餐记忆获取paymentstatus " << flag << PaymentStatus;
+    qDebug() << "获取近期订单 " << PaymentStatus << flag << qstr;
+    if(PaymentStatus.isEmpty()) return ;
+    qDebug() << "点餐记忆获取paymentstatus " << flag << PaymentStatus;
     if(! QString::compare(PaymentStatus, "0")) {
         // 如果没有付款 此时付款状态为0 表示未付款
-        qstr = QString("select DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
+        qstr = QString("select DishName, Price, Quantity, CustomerNote, TableNumber from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
         bool flag = query.exec(qstr);
         qDebug() << "点餐记忆未付款 " << flag << qstr;
         int row = 0;
         double SumPrice = 0;
         while(query.next()) {
+            this->tableId = query.value("TableNumber").toInt();
             QString DishName = query.value("DishName").toString(),
                     Price = query.value("Price").toString(),
                     Quantity = query.value("Quantity").toString(),
@@ -197,7 +241,7 @@ void MainWindow::showRecentOrder(){
         if(reply == QMessageBox::Yes) {
             qDebug() << "点餐记忆 yes";
             // 获取最近一次点单
-            qstr = QString("select TableNumber, DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
+            qstr = QString("select TableNumber, DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 1 order by OrderTime desc").arg(QString::fromStdString(this->name));
             bool flag = query.exec(qstr);
             int row = 0;
             double SumPrice = 0;
@@ -228,9 +272,41 @@ void MainWindow::showRecentOrder(){
             QString SumPriceString = QString::number(SumPrice) + "元";
             ui->Sum->setText(SumPriceString);
             // 将付款状态改为0 以及时间戳改成最近的时间
-            qstr = QString("update orders set PatmentStatus = 0, OrderTime = NOW() where TableNumber = %1").arg(lastTableNumber);
+            qstr = QString("update orders set PaymentStatus = 0, OrderTime = NOW() where customername = '%1' and TableNumber = %2")
+                    .arg(QString::fromStdString(this->name)).arg(lastTableNumber);
+            flag = query.exec(qstr);
+            qDebug() << "更新付款状态 " << flag << qstr;
         }
     }
+    db.close();
+}
+
+void MainWindow::updateMenu()
+{
+    DataBaseInit();
+    QSqlQuery query(db);
+    QString qstr = QString("update menu set rating = "
+                           "(select avg(rating) from menucomments where menucomments.MenuId = menu.id)");
+    bool flag = query.exec(qstr);
+    qDebug() << "更新评分 " << flag << qstr;
+    db.close();
+}
+
+void MainWindow::getTableId()
+{
+    DataBaseInit();
+    QSqlQuery query(db);
+    std::vector<int> p;
+    QString qstr = QString("select TableNumber from orders where customername = '%1'").arg(QString::fromStdString(this->name));
+    bool flag = query.exec(qstr);
+    qDebug() << "查找桌号 " << flag << qstr;
+    while(query.next()) {
+        int id = query.value("TableNumber").toInt();
+        p.push_back(id);
+    }
+    int mx = *max_element(p.begin(), p.end());
+    this->tableId = mx + 1;
+    qDebug() << "本桌的桌号是 " << this->tableId;
     db.close();
 }
 
@@ -293,17 +369,55 @@ void MainWindow::on_ShowCommentBtn_3_clicked()
     ui->MenuNum->clear();
     QString MenuId = ui->MenuId->text();
     QSqlQuery query(db);
-    QString qstr = QString("select sum(Price * Quantity) from orders where MenuId = %1").arg(MenuId);
-    query.exec(qstr);
+    QString qstr = QString("select sum(Price * Quantity) from orders where MenuId = %1 and customername = '%2' and TableNumber = %3")
+            .arg(MenuId).arg(QString::fromStdString(this->name)).arg(this->tableId);
+    bool flag = query.exec(qstr);
+    qDebug() << "删除菜品 " << flag << qstr;
     query.first();
     QString SumPrice = query.value(0).toString();
     QString prePrice = ui->Sum->text();
     prePrice.chop(1);
-    qDebug() << prePrice;
     QString SumPriceString = QString::number(prePrice.toDouble() - SumPrice.toDouble()) + "元";
+    qDebug() << prePrice << SumPrice << SumPriceString;
     ui->Sum->setText(SumPriceString);
-    qstr = QString("delete from orders where Table_name = %1").arg(MenuId);
-    query.exec(qstr);
+    qstr = QString("delete from orders where MenuId = %1 and customername = '%2' and TableNumber = %3")
+            .arg(MenuId).arg(QString::fromStdString(this->name)).arg(this->tableId);
+    flag = query.exec(qstr);
+    qDebug() << "从数据库中删除菜品 " << flag << qstr;
+
+    modelOrder->clear();
+    modelOrder->setHorizontalHeaderLabels(QStringList() << "菜名" << "价格" << "份数" << "备注");
+    ui->Order->setModel(modelOrder);
+    ui->Order->horizontalHeader()->setStyleSheet(
+      "QHeaderView::section{"
+      "border-top:0px solid #E5E5E5;"
+      "border-left:0px solid #E5E5E5;"
+      "border-right:0.5px solid #E5E5E5;"
+      "border-bottom: 0.5px solid #E5E5E5;"
+      "background-color:white;"
+      "padding:4px;"
+      "}"
+    ); // 给列表添加样式表
+    query.exec("set names 'GBK'");
+    qstr = QString("select DishName, Price, Quantity, CustomerNote from orders where customername = '%1' and PaymentStatus = 0").arg(QString::fromStdString(this->name));
+    flag = query.exec(qstr);
+    qDebug() << "删除后查询数据 " << flag << qstr;
+    int row = 0;
+    while(query.next()) {
+        QString DishName = query.value("DishName").toString(),
+                Price = query.value("Price").toString(),
+                Quantity = query.value("Quantity").toString(),
+                CustomerNote = query.value("CustomerNote").toString();
+        modelOrder->setItem(row, 0, new QStandardItem(DishName));
+        modelOrder->setItem(row, 1, new QStandardItem(Price));
+        modelOrder->setItem(row, 2, new QStandardItem(Quantity));
+        modelOrder->setItem(row, 3, new QStandardItem(CustomerNote));
+        modelOrder->item(row, 0)->setTextAlignment(Qt::AlignCenter);
+        modelOrder->item(row, 1)->setTextAlignment(Qt::AlignCenter);
+        modelOrder->item(row, 2)->setTextAlignment(Qt::AlignCenter);
+        modelOrder->item(row, 3)->setTextAlignment(Qt::AlignCenter);
+        row ++;
+    }
     db.close();
 }
 

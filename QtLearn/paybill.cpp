@@ -100,7 +100,8 @@ void payBill::DataBaseInit()
 
 void payBill::on_pushButton_clicked()
 {
-    QString TimeStamp;
+    QString TimeStamp;// 获取时间戳
+
     QMessageBox::StandardButton reply = QMessageBox::question(
                 nullptr, "付款", "确定付款？",
                 QMessageBox::Yes | QMessageBox::No);
@@ -122,18 +123,11 @@ void payBill::on_pushButton_clicked()
         query.first();
         TimeStamp = query.value("OrderTime").toString();
 
-        // 3 将订单中的paymentstatus改成1 即true 已付款
-        qstr = QString("update orders set PaymentStatus = 1 where customername = '%1'").arg(QString::fromStdString(this->username));
-        flag = query.exec(qstr);
-        qDebug() << "更新付款状态 " << flag;
-
         db.close();
+        Comment* commentWindow = new Comment(this->username);
+        commentWindow->show();
+        this->close();
     }else {
         QMessageBox::warning(nullptr, "未确定", "请联系服务员进一步确认！");
     }
-
-    Comment* commentWindow = new Comment(this->username, TimeStamp);
-    commentWindow->show();
-
-    this->close();
 }

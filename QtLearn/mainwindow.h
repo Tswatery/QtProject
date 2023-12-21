@@ -24,6 +24,8 @@ public:
     void getVipLevel();
     void updateVipLevel();
     void showRecentOrder();
+    void updateMenu();
+    void getTableId();
 
 private slots:
     void on_ShowCommentBtn_2_clicked();

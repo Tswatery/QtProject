@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QMessageBox>
+#include <QSqlQuery>
 
 Page_Login::Page_Login(QWidget *parent) :
     QWidget(parent),
@@ -19,6 +20,20 @@ Page_Login::Page_Login(QWidget *parent) :
 Page_Login::~Page_Login()
 {
     delete ui;
+}
+
+void Page_Login::DataBaseInit()
+{
+    if(QSqlDatabase::contains("qt_sql_default_connection"))
+        db = QSqlDatabase::database("qt_sql_default_connection");
+    else
+        db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setPort(3306);
+    db.setHostName("localhost");
+    db.setDatabaseName("myqt_project");
+    db.setUserName("root");
+    db.setPassword("123456");
+    db.open();
 }
 
 void Page_Login::attemptLogin(){
@@ -42,10 +57,17 @@ void Page_Login::attemptLogin(){
     db->close();
     delete db; // 防止内存泄漏
 }
-
-void Page_Login::on_btn_exit_clicked()
+void Page_Login::on_btn_signup_clicked()
 {
-    // exit
-    qDebug() << "点击了提出按钮";
-    exit(0);
+    QString pwd = ui->pwd->text();
+    QString usr = ui->usr->text();
+    DataBaseInit();
+    QSqlQuery query(db);
+    QString qstr = QString("insert into users(username, password, role) values ('%1', '%2', 'customer')").arg(usr).arg(pwd);
+    bool flag = query.exec(qstr);
+    qDebug() << "注册 " << flag << qstr;
+    if(flag ){
+        QMessageBox::information(nullptr, "注册成功", "您已注册成功！");
+    }
+    db.close();
 }

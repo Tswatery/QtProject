@@ -14,7 +14,7 @@ class Comment : public QWidget
     Q_OBJECT
 
 public:
-    explicit Comment(std::string& name, QString& timestamp, QWidget *parent = 0);
+    explicit Comment(std::string& name, QWidget *parent = 0);
     ~Comment();
     void DataBaseInit();
     void showOrder();
